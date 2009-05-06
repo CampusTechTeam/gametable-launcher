@@ -19,7 +19,7 @@ import config
 from libavg import avg, Point2D, anim
 from libavg.mathutil import getScaledDim, getOffsetForMovedPivot
 
-from libavg import AVGMTAppStarter, AVGAppStarter, AVGApp
+from libavg import AVGApp
 
 import math
 import os
@@ -29,6 +29,7 @@ import random
 g_player = avg.Player.get()
 
 class AppChooser (AVGApp):
+    multitouch = True
     def __init__(self, parentNode):
         self.__parentNode = parentNode
         parentNode.mediadir="media/"
@@ -245,8 +246,5 @@ def createRandomZoomAnim(*args, **kwargs):
     return klass(*args, **kwargs)
 
 if __name__ == '__main__':
-    AVGMTAppStarter(appClass = AppChooser, resolution = config.resolution)
-    #AVGAppStarter(app = AppChooser, resolution = config.resolution)
-
-
+    AppChooser.start(resolution = config.resolution)
 
