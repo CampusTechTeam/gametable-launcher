@@ -51,6 +51,10 @@ class AppChooser (AVGApp):
         self.__loadApps(self.__appsNode)
         self.__createGrid()
 
+    def init(self):
+        for app in self.__apps.values():
+            app['instance'].init()
+
     def __loadApps(self, parentNode):
         appDirs = []
         def handleEntry(maindir, dirname, fname):
@@ -185,7 +189,7 @@ class ZoomAnimSimple(ZoomAnimBase):
     def _fadeToApp(self, onDone):
         anim.fadeIn(self._appNode,
                 ZoomAnimSimple.fadeDuration,
-                onStop = onDone)
+                onStop = onDone).start()
     def zoomIn(self, onDone = lambda: None):
         # TODO: non-linear?
         for attr, target in (
@@ -196,7 +200,7 @@ class ZoomAnimSimple(ZoomAnimBase):
                     attr,
                     ZoomAnimRotate.scaleDuration,
                     getattr(self._previewNode, attr),
-                    target)
+                    target).start()
 
         g_player.setTimeout(ZoomAnimRotate.scaleDuration,
                 lambda: self._fadeToApp(onDone))
@@ -207,12 +211,12 @@ class ZoomAnimSimple(ZoomAnimBase):
                     attr,
                     ZoomAnimSimple.scaleDuration,
                     getattr(self._previewNode, attr),
-                    self._previewNodeParams[attr])
+                    self._previewNodeParams[attr]).start()
         g_player.setTimeout(ZoomAnimSimple.scaleDuration, onDone)
     def zoomOut(self, onDone):
         anim.fadeOut(self._appNode,
                 ZoomAnimSimple.fadeDuration,
-                onStop = lambda: self._zoomOut(onDone))
+                onStop = lambda: self._zoomOut(onDone)).start()
 
 class ZoomAnimRotate(ZoomAnimSimple):
     def zoomIn(self, onDone = lambda: None):
@@ -226,7 +230,7 @@ class ZoomAnimRotate(ZoomAnimSimple):
                 'angle',
                 ZoomAnimRotate.scaleDuration,
                 self._previewNode.angle,
-                self._appNode.angle + 2*math.pi)
+                self._appNode.angle + 2*math.pi).start()
 
         super(ZoomAnimRotate,self).zoomIn(onDone)
     def _zoomOut(self, onDone):
@@ -234,7 +238,7 @@ class ZoomAnimRotate(ZoomAnimSimple):
                 'angle',
                 ZoomAnimRotate.scaleDuration,
                 self._previewNode.angle,
-                self._previewNodeParams['angle'] - 2 * math.pi)
+                self._previewNodeParams['angle'] - 2 * math.pi).start()
         super(ZoomAnimRotate,self)._zoomOut(onDone)
 
 def createRandomZoomAnim(*args, **kwargs):
