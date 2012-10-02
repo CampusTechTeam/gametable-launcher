@@ -16,7 +16,7 @@
 # along with appChooser.  If not, see <http://www.gnu.org/licenses/>.
 
 import config
-from libavg import avg, Point2D, anim
+from libavg import avg, Point2D
 from libavg.mathutil import getScaledDim, getOffsetForMovedPivot
 
 from libavg import AVGApp
@@ -187,36 +187,38 @@ class ZoomAnimSimple(ZoomAnimBase):
     scaleDuration = 300
     fadeDuration = 600
     def _fadeToApp(self, onDone):
-        anim.fadeIn(self._appNode,
+        avg.fadeIn(self._appNode,
                 ZoomAnimSimple.fadeDuration,
-                onStop = onDone).start()
+                1.0,
+                onDone)
     def zoomIn(self, onDone = lambda: None):
         # TODO: non-linear?
         for attr, target in (
                 ('pos', Point2D(0,0)),
                 ('size', self._appNode.size),
                 ):
-            anim.LinearAnim(self._previewNode,
+            avg.LinearAnim(self._previewNode,
                     attr,
                     ZoomAnimRotate.scaleDuration,
                     getattr(self._previewNode, attr),
-                    target).start()
+                    target)
 
         g_player.setTimeout(ZoomAnimRotate.scaleDuration,
                 lambda: self._fadeToApp(onDone))
 
     def _zoomOut(self, onDone):
         for attr in ('pos', 'size'):
-            anim.LinearAnim(self._previewNode,
+            avg.LinearAnim(self._previewNode,
                     attr,
                     ZoomAnimSimple.scaleDuration,
                     getattr(self._previewNode, attr),
-                    self._previewNodeParams[attr]).start()
+                    self._previewNodeParams[attr])
         g_player.setTimeout(ZoomAnimSimple.scaleDuration, onDone)
     def zoomOut(self, onDone):
-        anim.fadeOut(self._appNode,
+        avg.fadeOut(self._appNode,
                 ZoomAnimSimple.fadeDuration,
-                onStop = lambda: self._zoomOut(onDone)).start()
+                stopCallback=lambda: self._zoomOut(onDone))
+
 
 class ZoomAnimRotate(ZoomAnimSimple):
     def zoomIn(self, onDone = lambda: None):
@@ -226,19 +228,19 @@ class ZoomAnimRotate(ZoomAnimSimple):
                 newPivot = newPivot,
                 angle = self._previewNode.angle)
 
-        anim.LinearAnim(self._previewNode,
+        avg.LinearAnim(self._previewNode,
                 'angle',
                 ZoomAnimRotate.scaleDuration,
                 self._previewNode.angle,
-                self._appNode.angle + 2*math.pi).start()
+                self._appNode.angle + 2*math.pi)
 
         super(ZoomAnimRotate,self).zoomIn(onDone)
     def _zoomOut(self, onDone):
-        anim.LinearAnim(self._previewNode,
+        avg.LinearAnim(self._previewNode,
                 'angle',
                 ZoomAnimRotate.scaleDuration,
                 self._previewNode.angle,
-                self._previewNodeParams['angle'] - 2 * math.pi).start()
+                self._previewNodeParams['angle'] - 2 * math.pi)
         super(ZoomAnimRotate,self)._zoomOut(onDone)
 
 def createRandomZoomAnim(*args, **kwargs):
